@@ -5,5 +5,6 @@
 ```js
 npm install
 node app.js
+```
 
->the server run on localhost:3000;
+> the server run on localhost:3000.
