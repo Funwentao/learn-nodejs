@@ -7,3 +7,10 @@ function sum(a, b) {
   let newB = (a & b) << 1
   return sum(newA, newB)
 }
+
+function createObj(fn, ...args) {
+  let obj = new Object()
+  fn.apply(obj, args)
+  obj.__proto__ = fn.prototype
+  return obj
+}

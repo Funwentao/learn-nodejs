@@ -192,3 +192,132 @@ let onWatch = (obj, setBind, getLogger) => {
   }
 }
 ```
+## ES5继承
+```js
+//原型链继承
+function SuperType () {
+  this.property = true
+}
+SuperType.prototype.getSuperValue = function () {
+  return this.property
+}
+function SubType() {
+  this.subproperty = false
+}
+SubType.prototype = new SuperType()
+
+//借用构造函数
+function SuperType() {
+  this.colors = ['red', 'blue', 'green']
+}
+function SubType() {
+  SuperType.call(this)
+}
+let instance = new SubType()
+
+//组合继承
+function SuperType(name) {
+  this.name = name
+  this.colors = ['red', 'green', 'blue']
+}
+SuperType.prototype.sayName = function() {
+  console.log(this.name)
+}
+function SubType(name, age) {
+  SuperType.call(this, name)
+  this.age = age
+}
+SubType.prototype = new SuperType()
+SubType.prototype.constructor = SubType
+SubType.prototype.sayAge = function() {
+  console.log(this.age)
+}
+
+//原型式继承
+function object(o) {
+  function F(){}
+  F.prototype = o
+  return new F()
+}
+let person = {
+  name: 'Annika',
+  friends: ['Alice', 'Joyce']
+}
+let anotherPerson = object(person)
+anotherPerson.name = 'Greg'
+anotherPerson.friends.push('Rob')
+
+//寄生组合继承
+function SubType(name) {
+  SuperType.call(this)
+  this.name = name
+}
+;(function() {
+  let super = function(){}
+  super.prototype = SuperType.prototype
+  SubType.prototype = new super()
+  SubType.prototype.constructor = SubType
+})()
+```
+## Promise实现
+```js
+const PENDING = 'pending'
+const RESOLVED = 'resolved'
+const REJECTED = 'rejected'
+
+function MyPromise(fn) {
+  let _this = this
+  _this.currentState = PENDING
+  _this.value = undefined
+  _this.resolvedCallbacks = []
+  _this.rejectedCallbacks = []
+  _this.resolve = function(value) {
+    if(value instanceof MyPromise) {
+      return value.then(_this.resolve, _this.reject)
+    }
+    setTimeout(() =>{
+      if(_this.currentState === PENDING) {
+        _this.currentState = RESOLVED
+        _this.value = value
+        _this.resolvedCallbacks.forEach(cb => cb())
+      }
+    })
+  }
+
+  _this.reject = function(reason) {
+    setTimeout(() => {
+      if(_this.currentState === PENDING) {
+        _this.currentState = REJECTED
+        _this.value = reason
+        _this.rejectedCallbacks.forEach(cb => cb())
+      }
+    })
+  }
+  
+  try {
+    fn(_this.resolve, _this.reject)
+  } catch(e) {
+    _this.reject(e)
+  }
+}
+
+MyPromise.prototype.then = function(onResolved, onRejected) {
+  let self = this
+  let promise2
+
+  onResolved = typeof onResolved = 'function' ? onResolved : v => v
+  onRejected = typeof onRejected = 'function' ? onRejected : r => throw r
+
+  if(self.currentState === RESOLVE) {
+    return (promise2 = new MyPromise(function(resolve, reject))) {
+      setTimeout(function() {
+        try {
+          let x = onResolved(self.value)
+          resolutionProcedure(promise2, x, resolve, reject)
+        } catch(reason) {
+          reject(reason)
+        }
+      })
+    }
+  }
+}
