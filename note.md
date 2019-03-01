@@ -139,3 +139,56 @@ new Foo().getName(); // -> 2
 new (Foo.getName());
 (new Foo()).getName();
 ```
+## 模拟实现call、apply和bind
+```js
+Function.prototype.myCall = function(context) {
+  let ctx = context || window
+
+  ctx.fn = this
+  let args = [...arguments].slice(1)
+  let result = ctx.fn(...args);
+  delete ctx.fn
+  return result
+}
+
+Function.prototype.myApply = function(context) {
+  let ctx = context || window
+
+  ctx.fn = this
+  let result = arguments[1] ? ctx.fn(...arguments[1]) : ctx.fn()
+  delete ctx.fn
+  return result
+}
+
+Function.prototype.myBind = function(context) {
+  let ctx = context || window
+  let args = [...arguments].slice(1)
+  let that = this
+
+  ctx.fn = this
+
+  return function f() {
+    if(this instanceof f) {
+      return new that(...args, ...arguments)
+    } else {
+      return ctx.fn(...args, ...arguments)
+    }
+  }
+}
+```
+## proxy
+```js
+let onWatch = (obj, setBind, getLogger) => {
+  let handler = {
+    get(target, property, receiver) {
+      getLogger(target, property)
+      return Reflect.get(target, property, receiver)
+    },
+    set(target, property, value, receiver) {
+      setBind(value)
+      return Reflect.set(target, property, value, receiver)
+    }
+    return new Proxy(obj, handler)
+  }
+}
+```
