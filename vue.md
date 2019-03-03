@@ -134,3 +134,118 @@ Vue.component('my-component', {
 ```
 注意：prop会在一个组件实例创建之前进行验证，所以实例的属性(`data` `computed`等)在`default`或`validator`函数中是不可用的。
 
+## 禁用特性继承
+如果你不希望组件的根元素继承特性，你可以在组件的选项中设置`inheritAttrs:  false`。
+```js
+Vue.component('base-input', {
+  inheritAttrs: false,
+  porps: ['label'],
+  template: `<label>
+              {{label}}
+              <input v-bind="$attrs"/>
+            <label>`
+})
+```
+```html
+<base-input label="姓名" class="username-input" placeholder="Enter your username" data-date-picker="activated"/>
+<!-- 运行后的html结构如下 -->
+<label class="username-input">
+  姓名<input placeholder="Enter your username" data-date-picker="activated">
+<label>
+```
+## 事件名
+不同于组件和prop，事件名不存在任何自动化的大小写转换。而是触发的事件名需要完全匹配监听这个事件所用的名称。举个例子，如果触发一个camelCase名字的事件：
+```js
+this.$emit('myEvent')
+```
+则监听这个名字的kebab-case版本是不会有任何效果的：
+```html
+<!-- 没有效果 -->
+<my-component v-on:my-event="doSomething"/>
+```
+不同于组件和prop，事件名不会被用作一个JavaScript变量名或属性名，所以就没有理由使用`camelCase`或`PascalCase`了。并且`v-on`事件监听器在DOM模板中会被自动转换为全小写（因为HTML是大小写不敏感的），所以`v-on:myEvent`将会变成`v-on:event`————导致myEvent不会可能被监听到。因此推荐始终使用`kebab-case`的事件名。
+## 自定义组件的`v-model`
+一个组件上的`v-model`默认会利用名为`value`的prop和名为`input`的事件，但是想像单选框、复选框等类型的输入控件可能会将`value`特性用于不同的目的。`model`选项可以用来避免这样的冲突：
+```js
+Vue.component.('base-checkbox', {
+  model: {
+    prop: 'checked',
+    event: 'change'
+  },
+  props: {
+    checked: Boolean
+  },
+  template: `
+    <input
+      type="checkbox"
+      v-bind:checked="checked"
+      v-on:change="$emit('change', $event.target.checked)"
+    >
+  `
+})
+```
+```html
+<!-- 这里的 lovingVue 的值将会传入这个名为 checked 的 prop。同时当 <base-checkbox> 触发一个 change 事件并附带一个新的值的时候，这个 lovingVue 的属性将会被更新。 -->
+<base-checkbox v-model="lovingVue"></base-checkbox>
+<!-- 注意你仍然需要在组件的 props 选项里声明 checked 这个 prop。 -->
+```
+## 将原生事件绑定到组件上
+```html
+<base-input v-on:focus.native="onFocus"></base-input>
+```
+这时，父级的 `.native` 监听器将静默失败。它不会产生任何报错，但是 `onFocus` 处理函数不会如你预期地被调用。
+
+为了解决这个问题，Vue 提供了一个 `$listeners` 属性，它是一个对象，里面包含了作用在这个组件上的所有监听器。例如：
+```js
+{
+  focus: function (event) { /* ... */ },
+  input: function (value) { /* ... */ }
+}
+```
+有了这个 $listeners 属性，你就可以配合 v-on="$listeners" 将所有的事件监听器指向这个组件的某个特定的子元素。对于类似 `<input> `的你希望它也可以配合 v-model 工作的组件来说，为这些监听器创建一个类似下述 inputListeners 的计算属性通常是非常有用的：
+```js
+Vue.component('base-input', {
+  inheritAttrs: false,
+  props: ['label', 'value'],
+  computed: {
+    inputListeners: function () {
+      var vm = this
+      // `Object.assign` 将所有的对象合并为一个新对象
+      return Object.assign({},
+        // 我们从父级添加所有的监听器
+        this.$listeners,
+        // 然后我们添加自定义监听器，
+        // 或覆写一些监听器的行为
+        {
+          // 这里确保组件配合 `v-model` 的工作
+          input: function (event) {
+            vm.$emit('input', event.target.value)
+          }
+        }
+      )
+    }
+  },
+  template: `
+    <label>
+      {{ label }}
+      <input
+        v-bind="$attrs"
+        v-bind:value="value"
+        v-on="inputListeners"
+      >
+    </label>
+  `
+})
+```
+## `.sync`修饰符
+```html
+<comp :foo.sync="bar"></comp>
+```
+会被拓展成：
+```html
+<comp :foo="bar" @update:foo="val => bar = val"></comp>
+```
+当子组件需要更新 foo 的值时，它需要显式地触发一个更新事件：
+```js
+this.$emit('update:foo', newValue)
+```
