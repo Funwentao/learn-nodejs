@@ -14,3 +14,29 @@ function createObj(fn, ...args) {
   obj.__proto__ = fn.prototype
   return obj
 }
+```
+实现一个函数`sum(1,2)(3,4,5)(6).valueOf() = 21`
+```js
+function sum(...args) {
+  let r = 0
+  function fn(...args1) {
+    r = args1.reduce((a,b) => a + b, r)
+    return fn
+  }
+  fn.valueOf = function() {
+    return r
+  }
+  return fn(...args)
+}
+```
+实现函数柯里化
+```js
+function curry(fn) {
+  let args = []
+  function _c(a) {
+    a && args.push(a)
+    return args.length === fn.length ? fn.apply(null, args) : _c 
+  }
+  return _c()
+}
+```
