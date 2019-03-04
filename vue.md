@@ -39,7 +39,7 @@ computed: {
     get() {
       return this.firstName + ' ' + this.lastName
     },
-    set() {
+    set(newValue) {
       let names = newValue.split(' ')
       this.firstName = name[0]
       this.lastName = names[names.length - 1]
