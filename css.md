@@ -1,0 +1,9 @@
+- 盒子模型  
+标准盒子模型：宽度 = 内容的宽度(content) + border + padding + margin  
+低版本IE盒子模型： 宽度 = (content + border + padding) + margin
+- box-sizing  
+默认为content-box  
+content-box: W3C的标准盒子模型，设置元素的height/width属性指的是content部分的高/宽  
+border-box: IE传统盒子模型。设置元素的height/width属性指的是border+padding+content部分的高/宽
+-  css选择器，哪些可以继承  
+
