@@ -76,4 +76,41 @@ class BST {
     return node
   }
 }
-`````
+```
+```js
+// 中序遍历
+function midPrint(root) {
+  if(!root) return
+
+  print(root.left)
+  console.log(root.value)
+  print(root.right)
+}
+
+function fontPrint(root) {
+  if(!root) return
+
+  const stack = []
+  stack.push(root)
+  while(stack.length) {
+    let len = stack.length
+    let top = stack[len - 1]
+    let flag = 'left'
+
+    console.log(top.value)
+
+    if(top.left && flag === 'left') {
+      stack.push(top.left)
+      continue
+    }
+    if(top.right) {
+      stack.pop()
+      stack.push(top.right)
+      flag = 'left'
+      continue
+    }
+
+    stack.pop()
+    flag = 'right'
+  }
+}
