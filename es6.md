@@ -47,3 +47,63 @@ tag(['Hello ', ' world ', ''], 15, 50)
 ```js
 const [...butLast, last] = [1, 2, 3, 4, 5] // Uncaught SyntaxError: Rest element must be last elemen
 const [first, ...middle, last] = [1, 2, 3, 4, 5] // Uncaught SyntaxError: Rest element must be last elemen
+```
+`Array.from`方法用于将两类对象转为真正的数组：类数组对象和可遍历的对象
+```js
+let arrayLike = {
+  0: 'a',
+  1: 'b',
+  2: 'c',
+  length: 3
+}
+// es5
+var arr1 = [].slice.call(arrayLike)
+// es6
+let arr2 = Array.from(arrayLike)
+// Array.from还可以接受第二个参数，作用类似于数组的map
+Array.from(array, x => x * x)
+//等同于
+Array.form(array).map(x => x * x)
+```
+`Array.of`方法用于将一组值，转为数组
+```js
+Array.of(3, 1, 8) // [3, 1, 8]
+// 这个方法主要目的是弥补数组构造函数Array()的不足。因为参数个数的不同，导致Array()的行为有差异
+Array() // []
+Array(3) // [, , ,]
+Array(3, 11, 8) //[3, 11, 8]
+```
+`find`和`findIndex`
+```js
+[1, 4, -5, 10].find(x => x < 0) // -5
+```
+`Object.getOwnPropertyDescriptor`
+```js
+let obj = {foo: 123}
+Object.getOwnPropertyDescriptor(obj, 'foo')
+// {
+//   value: 123,
+//   writable: true,
+//   enumerable: true,
+//   configurable: true
+// }
+
+for...in
+// for...in循环遍历对象自身的和继承的可枚举属性（不含 Symbol 属性）。
+
+Object.keys(obj)
+// Object.keys返回一个数组，包括对象自身的（不含继承的）所有可枚举属性（不含 Symbol 属性）的键名。
+
+Object.getOwnPropertyNames(obj)
+//Object.getOwnPropertyNames返回一个数组，包含对象自身的所有属性（不含 Symbol 属性，但是包括不可枚举属性）的键名
+
+Object.getOwnPropertySymbols(obj)
+//Object.getOwnPropertySymbols返回一个数组，包含对象自身的所有 Symbol 属性的键名。
+
+Reflect.ownKeys(obj)
+//Reflect.ownKeys返回一个数组，包含对象自身的所有键名，不管键名是 Symbol 或字符串，也不管是否可枚举。
+```
+以上5中遍历方法都遵守同样的属性遍历的次序规则
+- 首先遍历所有的数值键，按照数值升序排列
+- 其次遍历所有字符串键，按照加入时间升序排列
+- 最后遍历所有Symbol键，按照加入时间升序排列
