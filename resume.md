@@ -13,4 +13,13 @@
 该小程序主要服务于线下会员，会员可通过该小程序进行远程建档，完善信息，约见面接红娘。我在此项目主要负责客户资料完善的部分。该小程序需要一些埋点，统计一些用户数据。一开始接手时是通过手动埋点，在需要埋点的事件植入一段埋点的代码，有很强的侵入性，与业务代码耦合。因为十分繁琐的工作促使我去实现了一个埋点SDK。主要思路是重写App和Page两个全局方法，建立一个埋点配置中心，主要有element埋点和method埋点，element埋点主要监听元素点击事件，给最外层的view增加一个catchtap事件，通过事件委托在事件捕获阶段就可触发该事件去做埋点信息上传。method埋点主要是重写了App和Page中需要日志上报的方法。
 ## 个人项目
 ### MiniZhihu
-这是我在大学期间搭建的项目
+这是我在大学期间搭建的项目，是模仿知乎做的web项目，完成功能：注册登录、提问、写文章、收藏和个人信息修改等。使用了webpack作为构建工具，自己编写webpack的配置文件，后台用koajs和mongodb。之前还将其部署到阿里云，使用pm2做进程守护。技术栈：react全家桶 + webpack + nodejs。这里是项目地址[https://github.com/Funwentao/MiniZhihu](https://github.com/Funwentao/MiniZhihu)。
+# 技能清单
+- vue + vuex + vue-router
+- 微信小程序开发
+- react + redux + react-router
+- 熟悉基本的webpack配置，能自己搭建开发环境
+- 掌握基本的数据结构和算法
+- 掌握基本的网络知识
+- nodejs，使用过express、koa、mongodb搭建过自己的nodeWeb
+- 掌握基本的git工作流
